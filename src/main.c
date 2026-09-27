@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int validateInput(int argc, char** argv) {
 	int result = 0; // result shows if everything works correctly or doesn't work in a proper way
@@ -74,6 +75,64 @@ int main(int argc, char** argv) {
 			int sc;
 			scanf("%d", &sc);
 			workspace[currIndex] = sc;
+			}
+
+		if(c == '[') {
+			char* loopBody = malloc(sizeof(char));
+			int size = 1;
+			
+			while((c=fgetc(workFileInstance))!=EOF && c != ']') {
+				loopBody = realloc(loopBody, sizeof(char)*size);
+				loopBody[size-1] = c;
+				size++;
+				}
+
+			int ILOOP_CATCH_OP_COUNTER = 0; // capsed only because necessary stuff. Max is 60000
+			int posFloatingExpansion = 0;
+			while (workspace[currIndex]) {
+				if(ILOOP_CATCH_OP_COUNTER > 60000) break;
+
+				for (int i = 0 ; i < size ; ++i) {
+					char ch = loopBody[i];
+					if(ch == '>') {
+						if (currIndex + posFloatingExpansion == 29999) {
+							posFloatingExpansion = currIndex-29999;
+							} else {
+							posFloatingExpansion++;
+							}
+						}
+
+					if(ch == '<') {
+						if (currIndex + posFloatingExpansion == 0) {
+							posFloatingExpansion = 29999 - currIndex;
+							} else {
+							posFloatingExpansion--;
+							}
+						}
+
+					if(ch == '+') {
+						workspace[currIndex+posFloatingExpansion]++;
+						}
+
+					if(ch == '-') {
+						workspace[currIndex+posFloatingExpansion]--;
+						}
+
+					if(ch == '.') {
+						putchar(workspace[currIndex+posFloatingExpansion]);
+						}
+
+					if(ch == ',') {
+						int sc;
+						scanf("%d", &sc);
+						workspace[currIndex+posFloatingExpansion] = sc;
+						}
+					}
+
+				ILOOP_CATCH_OP_COUNTER++;
+				}
+
+			free(loopBody);
 			}
 		}
 	putchar('\n');
